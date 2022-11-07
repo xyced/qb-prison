@@ -48,18 +48,14 @@ end
 ------ CHECK FOR PRISON BREAK ITEMS -------
 -------------------------------------------
 local function HasPrisonBreakItems()
-    local itemcheck = 0
+	local hasElecKit = QBCore.Functions.HasItem('electronickit')
+	local hasTrojan = QBCore.Functions.HasItem('trojan_usb')
 
-	for k,v in pairs(Config.PrisonBreak.Hack.Items) do
-        if QBCore.Functions.HasItem(v.item, v.amount) then
-            itemcheck = itemcheck + 1
-            if itemcheck == #Config.PrisonBreak.Hack.Items then
-                return true
-            end
-        else
-			return false
-        end
-    end
+	if hasElecKit and hasTrojan then
+		return true
+	else
+		return false
+	end
 end
 
 -------------------------------------------
@@ -155,185 +151,7 @@ end
 
 local function CreateAllTargets()
 	if not targetsCreated then
-		CheckTime = exports['qb-target']:AddBoxZone("prisontime", vector3(1827.3, 2587.72, 46.01), 0.4, 0.55, {
-			name = "prisontime",
-			heading = 0,
-			debugPoly = Config.DebugPoly,
-			minZ = 46.11,
-			maxZ = 47.01,
-			}, {
-				options = {
-				{
-					type = "client",
-					event = "qb-prison:client:checkTime",
-					icon = "fas fa-clock",
-					label = "Check Jail Time",
-				},
-				{
-					type = "client",
-					event = "qb-prison:client:jobMenu",
-					icon = "fas fa-cash-register",
-					label = "Choose Another Job",
-				},
-			},
-			distance = 2,
-		})
-		table.insert(TargetsTable, "prisontime")
-
-		for k,v in pairs(Config.Locations.PrisonBreak) do
-			exports['qb-target']:AddBoxZone("prisonbreak"..k, vector3(v.coords.x, v.coords.y, v.coords.z), v.length, v.width, {
-				name = "prisonbreak"..k,
-				heading = v.coords.w,
-				debugPoly = Config.DebugPoly,
-				minZ = v.coords.z - 1,
-				maxZ = v.coords.z + 1,
-				}, {
-					options = {
-					{
-						type = "client",
-						event = "qb-prison:StartPrisonBreak",
-						icon = "fas fa-laptop-code",
-						label = "Prison Break",
-						canInteract = function()
-							if HasPrisonBreakItems() then
-								return true
-							end
-						end
-					},
-				},
-				distance = 2,
-			})
-			table.insert(TargetsTable, "prisonbreak"..k)
-		end
-
-		Canteen = exports['qb-target']:AddBoxZone("prisoncanteen", vector3(1780.95, 2560.05, 45.67), 3.8, 0.5, {
-			name = "prisoncanteen",
-			heading = 90,
-			debugPoly = Config.DebugPoly,
-			minZ = 45.40,
-			maxZ = 45.85,
-			}, {
-				options = {
-				{
-					type = "client",
-					event = "qb-prison:client:useCanteen",
-					icon = "fas fa-utensils",
-					label = "Open Canteen",
-				},
-			},
-			distance = 2,
-		})
-		table.insert(TargetsTable, "prisoncanteen")
-
-		Slushy = exports['qb-target']:AddBoxZone("prisonslushy", vector3(1777.64, 2559.97, 45.67), 0.5, 0.7, {
-			name = "prisonslushy",
-			heading = 0,
-			debugPoly = Config.DebugPoly,
-			minZ = 45.50,
-			maxZ = 46.75,
-			}, {
-				options = {
-				{
-					type = "client",
-					event = "qb-prison:client:slushy",
-					icon = "fas fa-wine-bottle",
-					label = "Make Slushy",
-				},
-			},
-			distance = 2,
-		})
-		table.insert(TargetsTable, "prisonslushy")
-
-		Coffee = exports['qb-target']:AddBoxZone("prisoncoffee", vector3(1778.83, 2560.04, 45.67), 0.5, 0.3, {
-			name = "prisoncoffee",
-			heading = 0,
-			debugPoly = Config.DebugPoly,
-			minZ = 45.50,
-			maxZ = 46.75,
-			}, {
-				options = {
-				{
-					type = "client",
-					event = "qb-prison:client:coffee",
-					icon = "fas fa-mug-hot",
-					label = "Make Coffee",
-				},
-			},
-			distance = 2,
-		})
-		table.insert(TargetsTable, "prisoncoffee")
-
-		Soda = exports['qb-target']:AddBoxZone("prisonsoda", vector3(1778.26, 2560.02, 45.67), 0.6, 0.55, {
-			name = "prisonsoda",
-			heading = 0,
-			debugPoly = Config.DebugPoly,
-			minZ = 45.50,
-			maxZ = 46.75,
-			}, {
-				options = {
-				{
-					type = "client",
-					event = "qb-prison:client:soda",
-					icon = "fas fa-cash-register",
-					label = "Make Soda",
-				},
-			},
-			distance = 2,
-		})
-		table.insert(TargetsTable, "prisonsoda")
-
-		if Config.Crafting then
-			Crafting = exports['qb-target']:AddBoxZone("prisoncrafting", vector3(Config.CraftingLocation.x, Config.CraftingLocation.y, Config.CraftingLocation.z), 1.4, 0.5, {
-				name = "prisoncrafting",
-				heading = Config.CraftingLocation.w,
-				debugPoly = Config.DebugPoly,
-				minZ = Config.CraftingLocation.z - 1,
-				maxZ = Config.CraftingLocation.z + 1,
-				}, {
-					options = {
-					{
-						type = "client",
-						event = "qb-prison:CraftingMenu",
-						icon = "fas fa-toolbox",
-						label = "Prison Crafting",
-					},
-				},
-				distance = 2,
-			})
-
-			table.insert(TargetsTable, "prisoncrafting")
-		end
-
-		if not Config.QB_PrisonJobs then
-			exports['qb-target']:AddBoxZone("PrisonChinUp", Config.Workout.Chinup.coords, 1, 2.0, {
-				name = "PrisonChinUp",
-				heading = 30,
-				debugPoly = Config.DebugPoly,
-				minZ = Config.Workout.Chinup.coords.z - 1,
-				maxZ = Config.Workout.Chinup.coords.z + 1,
-			}, {
-				options = {
-					{
-						type = "client",
-						event = "qb-prison:client:DoChinUp",
-						icon = "fas fa-dumbbell",
-						label = "Do Chin-Ups",
-						canInteract = function()
-							if inJail then
-								return true
-							else
-								return false
-							end
-						end,
-					},
-				},
-				distance = 1.5
-			})
-
-			table.insert(TargetsTable, "PrisonChinUp")
-		end
-
-		targetsCreated = true
+		TriggerEvent('qb-prison:CreateTargets')
 	end
 
     if Config.Debug then
@@ -487,12 +305,13 @@ RegisterNetEvent('prison:client:Leave', function()
 		ShopBlip = nil
 		RemoveBlip(WorkBlip)
 		WorkBlip = nil
-		currentJob = nil
+		currentJob = nil --"electrician" old code
 		QBCore.Functions.Notify(Lang:t("success.free_"))
 		DoScreenFadeOut(500)
 		while not IsScreenFadedOut() do
 			Wait(10)
 		end
+		TriggerServerEvent('qb-clothes:loadPlayerSkin')
 		SetEntityCoords(PlayerPedId(), Config.Locations["outside"].coords.x, Config.Locations["outside"].coords.y, Config.Locations["outside"].coords.z, 0, 0, 0, false)
 		SetEntityHeading(PlayerPedId(), Config.Locations["outside"].coords.w)
 		DestroyAllTargets()
@@ -523,6 +342,7 @@ RegisterNetEvent('prison:client:UnjailPerson', function()
 		while not IsScreenFadedOut() do
 			Wait(10)
 		end
+		TriggerServerEvent('qb-clothes:loadPlayerSkin')
 		SetEntityCoords(PlayerPedId(), Config.Locations["outside"].coords.x, Config.Locations["outside"].coords.y, Config.Locations["outside"].coords.z, 0, 0, 0, false)
 		SetEntityHeading(PlayerPedId(), Config.Locations["outside"].coords.w)
 		Wait(500)
@@ -608,7 +428,7 @@ RegisterNetEvent('qb-prison:jobapplyElectrician', function(args)
 		inRange = true
         if inJail then
 			if currentJob ~= "electrician" then
-				currentJob = "electrician"
+				currentJob = "electrician" --"electrician" old code
 				CreatePrisonBlip()
 				QBCore.Functions.Notify('New Job: Electrician')
 
@@ -641,7 +461,7 @@ RegisterNetEvent('qb-prison:jobapplyCook', function(args)
 		inRange = true
         if inJail then
 			if currentJob ~= "cook" then
-				currentJob = "cook"
+				currentJob = "cook" --"electrician" old code
 				CreatePrisonBlip()
 				QBCore.Functions.Notify('New Job: Cook')
 
@@ -697,9 +517,9 @@ RegisterNetEvent('qb-prison:jobapplyJanitor', function(args)
 	end
 end)
 
--------------------------------
----------- CHECK TIME ---------
--------------------------------
+-------------------
+-- OTHER EVENTS --
+-------------------
 
 -- Check Time
 RegisterNetEvent('qb-prison:client:checkTime', function()
@@ -711,10 +531,6 @@ RegisterNetEvent('qb-prison:client:checkTime', function()
 	end
 end)
 
-
-------------------------------------
----------- DRINK MACHINES  ---------
-------------------------------------
 -- Use Canteen
 RegisterNetEvent('qb-prison:client:useCanteen', function()
 	if inJail then
@@ -743,10 +559,10 @@ RegisterNetEvent('qb-prison:client:slushy', function()
 						disableCarMovement = true,
 						disableMouse = false,
 						disableCombat = true,
-					}, {}, {}, {}, function()
+					}, {}, {}, {}, function() -- Done
 						SlushyTime(success)
 						ClearPedTasks(PlayerPedId())
-					end, function()
+					end, function() -- Cancel
 						QBCore.Functions.Notify("Canceled...", "error")
 						ClearPedTasks(PlayerPedId())
 					end, "slushy")
@@ -765,10 +581,10 @@ RegisterNetEvent('qb-prison:client:slushy', function()
 						disableCarMovement = true,
 						disableMouse = false,
 						disableCombat = true,
-					}, {}, {}, {}, function()
+					}, {}, {}, {}, function() -- Done
 						SlushyTime(success)
 						ClearPedTasks(PlayerPedId())
-					end, function()
+					end, function() -- Cancel
 						QBCore.Functions.Notify("Canceled...", "error")
 						ClearPedTasks(PlayerPedId())
 					end, "slushy")
@@ -857,10 +673,10 @@ RegisterNetEvent('qb-prison:client:soda', function()
 						disableCarMovement = true,
 						disableMouse = false,
 						disableCombat = true,
-					}, {}, {}, {}, function()
+					}, {}, {}, {}, function() -- Done
 						SodaTime(success)
 						ClearPedTasks(PlayerPedId())
-					end, function()
+					end, function() -- Cancel
 						QBCore.Functions.Notify("Canceled...", "error")
 						ClearPedTasks(PlayerPedId())
 					end, "bscoke")
@@ -879,10 +695,10 @@ RegisterNetEvent('qb-prison:client:soda', function()
 						disableCarMovement = true,
 						disableMouse = false,
 						disableCombat = true,
-					}, {}, {}, {}, function()
+					}, {}, {}, {}, function() -- Done
 						SodaTime(success)
 						ClearPedTasks(PlayerPedId())
-					end, function()
+					end, function() -- Cancel
 						QBCore.Functions.Notify("Canceled...", "error")
 						ClearPedTasks(PlayerPedId())
 					end, "bscoke")
@@ -905,10 +721,10 @@ RegisterNetEvent('qb-prison:client:soda', function()
 					disableCarMovement = true,
 					disableMouse = false,
 					disableCombat = true,
-				}, {}, {}, {}, function()
+				}, {}, {}, {}, function() -- Done
 					SodaTime(Skillbar)
 					ClearPedTasks(PlayerPedId())
-				end, function()
+				end, function() -- Cancel
 					QBCore.Functions.Notify("Canceled...", "error")
 					ClearPedTasks(PlayerPedId())
 				end, "bscoke")
@@ -926,10 +742,10 @@ RegisterNetEvent('qb-prison:client:soda', function()
 					disableCarMovement = true,
 					disableMouse = false,
 					disableCombat = true,
-				}, {}, {}, {}, function()
+				}, {}, {}, {}, function() -- Done
 					SodaTime(success)
 					ClearPedTasks(PlayerPedId())
-				end, function()
+				end, function() -- Cancel
 					QBCore.Functions.Notify("Canceled...", "error")
 					ClearPedTasks(PlayerPedId())
 				end, "bscoke")
@@ -993,7 +809,6 @@ RegisterNetEvent('qb-prison:CraftingMenu', function()
 			text = text .. "- " .. QBCore.Shared.Items[v.item].label .. ": " .. v.amount .. "x <br>"
 		end
 		item.text = text
-		item.icon = v.receive
 		item.params = {
 			event = 'qb-prison:CraftItem',
 			args = {
@@ -1008,9 +823,12 @@ RegisterNetEvent('qb-prison:CraftingMenu', function()
 end)
 
 local function CraftItem(item)
-	local craftedItem = Config.CraftingItems[item].receive
 
-	QBCore.Functions.Progressbar('crafting_item', 'Crafting '..sharedItems[craftedItem].label, 5000, false, false, {
+	if Config.Debug then
+	  print(item, Config.CraftingItems[item].receive)
+	end
+
+	QBCore.Functions.Progressbar('crafting_item', 'Crafting '..item, 5000, false, false, {
 		disableMovement = true,
 		disableCarMovement = true,
 		disableMouse = false,
@@ -1018,24 +836,28 @@ local function CraftItem(item)
 	}, {
 		animDict = "mini@repair",
 		anim = "fixing_a_ped",
-		}, {}, {}, function()
+		}, {}, {}, function() -- Success
 		QBCore.Functions.Notify("Crafted "..item, 'success')
 		TriggerServerEvent('qb-prison:server:GetCraftedItem', Config.CraftingItems[item].receive)
-		TriggerServerEvent('qb-prison:server:RemoveCraftingItems', item)
+		for k, v in pairs(Config.CraftingItems[item].materials) do
+		  TriggerServerEvent('QBCore:Server:RemoveItem', v.item, v.amount)
+		  TriggerEvent("inventory:client:ItemBox", QBCore.Shared.Items[v.item], "remove")
+		end
 		TriggerEvent('animations:client:EmoteCommandStart', {"c"})
 		ClearPedTasks(PlayerPedId())
-	end, function()
+	end, function() -- Cancel
 		ClearPedTasks(PlayerPedId())
 		QBCore.Functions.Notify('Canceled...', 'error')
 	end)
-
-	if Config.Debug then
-		print(item, Config.CraftingItems[item].receive)
-	  end
 end
 
 -- Uses Callback to Check for Materials
 RegisterNetEvent('qb-prison:CraftItem', function(data)
+
+	if Config.Debug then
+		print(data.item)
+	end
+
 	QBCore.Functions.TriggerCallback("qb-prison:server:CraftingMaterials", function(hasMaterials)
 		if (hasMaterials) then
 			CraftItem(data.item)
@@ -1044,10 +866,223 @@ RegisterNetEvent('qb-prison:CraftItem', function(data)
 			return
 		end
 	end, Config.CraftingItems[data.item].materials)
+end)
 
-	if Config.Debug then
-		print(data.item)
+RegisterNetEvent('qb-prison:client:GetCraftingItems', function(job)
+	if job == 'janitor' then
+		local JanitorItem = math.random(1, #Config.JanitorItems)
+		TriggerServerEvent('qb-prison:server:GetCraftingItems', Config.JanitorItems[JanitorItem].item, Config.JanitorItems[JanitorItem].amount)
+
+		if Config.Debug then
+			print("Received "..Config.JanitorItems[JanitorItem].amount.."x "..Config.JanitorItems[JanitorItem].item.." from cleaning")
+		end
+
+	elseif job == 'cook' then
+		local CookItem = math.random(1, #Config.CookItems)
+		TriggerServerEvent('qb-prison:server:GetCraftingItems', Config.CookItems[CookItem].item, Config.CookItems[CookItem].amount)
+
+		if Config.Debug then
+			print("Received "..Config.CookItems[CookItem].amount.."x "..Config.CookItems[CookItem].item.." from cooking")
+		end
+
+	elseif job == 'electrician' then
+		local ElectricianItem = math.random(1, #Config.ElectricianItems)
+
+		TriggerServerEvent('qb-prison:server:GetCraftingItems', Config.ElectricianItems[ElectricianItem].item, Config.ElectricianItems[ElectricianItem].amount)
+
+		if Config.Debug then
+			print("Received "..Config.ElectricianItems[ElectricianItem].amount.."x "..Config.ElectricianItems[ElectricianItem].item.." from fixing electrical")
+		end
+
 	end
+end)
+
+------------------
+-- TARGET EVENT --
+------------------
+-- Create Targets
+RegisterNetEvent('qb-prison:CreateTargets', function()
+
+	CheckTime = exports['qb-target']:AddBoxZone("prisontime", vector3(1827.3, 2587.72, 46.01), 0.4, 0.55, {
+        name = "prisontime",
+        heading = 0,
+        debugPoly = Config.DebugPoly,
+		minZ = 46.11,
+		maxZ = 47.01,
+        }, {
+            options = {
+            {
+                type = "client",
+                event = "qb-prison:client:checkTime",
+                icon = "fas fa-clock",
+                label = "Check Jail Time",
+            },
+            {
+                type = "client",
+                event = "qb-prison:client:jobMenu",
+                icon = "fas fa-cash-register",
+                label = "Choose Another Job",
+            },
+        },
+        distance = 2,
+    })
+	table.insert(TargetsTable, "prisontime")
+
+	for k,v in pairs(Config.Locations.PrisonBreak) do
+		exports['qb-target']:AddBoxZone("prisonbreak"..k, vector3(v.coords.x, v.coords.y, v.coords.z), v.length, v.width, {
+			name = "prisonbreak"..k,
+			heading = v.coords.w,
+			debugPoly = Config.DebugPoly,
+			minZ = v.coords.z - 1,
+			maxZ = v.coords.z + 1,
+			}, {
+				options = {
+				{
+					type = "client",
+					event = "qb-prison:StartPrisonBreak",
+					icon = "fas fa-laptop-code",
+					label = "Prison Break",
+					canInteract = function()
+						if HasPrisonBreakItems() then
+							return true
+						end
+					end
+				},
+			},
+			distance = 2,
+		})
+		table.insert(TargetsTable, "prisonbreak"..k)
+	end
+
+    Canteen = exports['qb-target']:AddBoxZone("prisoncanteen", vector3(1780.95, 2560.05, 45.67), 3.8, 0.5, {
+        name = "prisoncanteen",
+        heading = 90,
+        debugPoly = Config.DebugPoly,
+		minZ = 45.40,
+		maxZ = 45.85,
+        }, {
+            options = {
+            {
+                type = "client",
+                event = "qb-prison:client:useCanteen",
+                icon = "fas fa-utensils",
+                label = "Open Canteen",
+            },
+        },
+        distance = 2,
+    })
+	table.insert(TargetsTable, "prisoncanteen")
+
+	Slushy = exports['qb-target']:AddBoxZone("prisonslushy", vector3(1777.64, 2559.97, 45.67), 0.5, 0.7, {
+        name = "prisonslushy",
+        heading = 0,
+        debugPoly = Config.DebugPoly,
+		minZ = 45.50,
+		maxZ = 46.75,
+        }, {
+            options = {
+            {
+                type = "client",
+                event = "qb-prison:client:slushy",
+                icon = "fas fa-wine-bottle",
+                label = "Make Slushy",
+            },
+        },
+        distance = 2,
+    })
+	table.insert(TargetsTable, "prisonslushy")
+
+	Coffee = exports['qb-target']:AddBoxZone("prisoncoffee", vector3(1778.83, 2560.04, 45.67), 0.5, 0.3, {
+        name = "prisoncoffee",
+        heading = 0,
+        debugPoly = Config.DebugPoly,
+		minZ = 45.50,
+		maxZ = 46.75,
+        }, {
+            options = {
+            {
+                type = "client",
+                event = "qb-prison:client:coffee",
+                icon = "fas fa-mug-hot",
+                label = "Make Coffee",
+            },
+        },
+        distance = 2,
+    })
+	table.insert(TargetsTable, "prisoncoffee")
+
+	Soda = exports['qb-target']:AddBoxZone("prisonsoda", vector3(1778.26, 2560.02, 45.67), 0.6, 0.55, {
+        name = "prisonsoda",
+        heading = 0,
+        debugPoly = Config.DebugPoly,
+		minZ = 45.50,
+		maxZ = 46.75,
+        }, {
+            options = {
+            {
+                type = "client",
+                event = "qb-prison:client:soda",
+                icon = "fas fa-cash-register",
+                label = "Make Soda",
+            },
+        },
+        distance = 2,
+    })
+	table.insert(TargetsTable, "prisonsoda")
+
+	if Config.Crafting then
+		Crafting = exports['qb-target']:AddBoxZone("prisoncrafting", vector3(Config.CraftingLocation.x, Config.CraftingLocation.y, Config.CraftingLocation.z), 1.4, 0.5, {
+			name = "prisoncrafting",
+			heading = Config.CraftingLocation.w,
+			debugPoly = Config.DebugPoly,
+			minZ = Config.CraftingLocation.z - 1,
+			maxZ = Config.CraftingLocation.z + 1,
+			}, {
+				options = {
+				{
+					type = "client",
+					event = "qb-prison:CraftingMenu",
+					icon = "fas fa-toolbox",
+					label = "Prison Crafting",
+				},
+			},
+			distance = 2,
+		})
+
+		table.insert(TargetsTable, "prisoncrafting")
+	end
+
+	if not Config.QB_PrisonJobs then
+		exports['qb-target']:AddBoxZone("PrisonChinUp", Config.Workout.Chinup.coords, 1, 2.0, {
+			name = "PrisonChinUp",
+			heading = 30,
+			debugPoly = Config.DebugPoly,
+			minZ = Config.Workout.Chinup.coords.z - 1,
+			maxZ = Config.Workout.Chinup.coords.z + 1,
+		}, {
+			options = {
+				{
+					type = "client",
+					event = "qb-prison:client:DoChinUp",
+					icon = "fas fa-dumbbell",
+					label = "Do Chin-Ups",
+					canInteract = function()
+						if inJail then
+							return true
+						else
+							return false
+						end
+					end,
+				},
+			},
+			distance = 1.5
+		})
+
+		table.insert(TargetsTable, "PrisonChinUp")
+	end
+
+	targetsCreated = true
+
 end)
 
 ----------------------------------
@@ -1085,9 +1120,6 @@ CreateThread(function()
 	end
 end)
 
-------------------------------
------ JAIL TIME COMMAND  -----
-------------------------------
 RegisterCommand('jailtime', function()
 	if inJail then
 		if not LiferCheck() then
